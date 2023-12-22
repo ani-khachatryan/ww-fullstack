@@ -1,0 +1,29 @@
+version: "3"
+services:
+  spring:
+    build: .
+    image: 'docker-spring-boot-postgres:latest'
+    container_name: spring
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://172.17.0.1:5432/compose-postgres
+      - SPRING_DATASOURCE_USERNAME=compose-postgres
+      - SPRING_DATASOURCE_PASSWORD=compose-postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+
+  db:
+    image: postgres:13.3
+    container_name: db
+    environment:
+      POSTGRES_USER: "compose-postgres"
+      POSTGRES_PASSWORD: "compose-postgres"
+#      POSTGRES_HOST_AUTH_METHOD: "trust"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./dbdata:/var/lib/postgresql/data
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
